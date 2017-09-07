@@ -1,0 +1,5 @@
+/obj/
+Source/obj/
+/Assemblies/
+.vs
+Thumbs.db
