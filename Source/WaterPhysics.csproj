@@ -17,7 +17,7 @@
     <DebugSymbols>true</DebugSymbols>
     <DebugType>full</DebugType>
     <Optimize>false</Optimize>
-    <OutputPath>..\Assemblies\</OutputPath>
+    <OutputPath>D:\Games\steamapps\common\RimWorld\Mods\WaterPhysics\Assemblies</OutputPath>
     <DefineConstants>DEBUG;TRACE</DefineConstants>
     <ErrorReport>prompt</ErrorReport>
     <WarningLevel>4</WarningLevel>
@@ -25,7 +25,7 @@
   <PropertyGroup Condition=" '$(Configuration)|$(Platform)' == 'Release|AnyCPU' ">
     <DebugType>none</DebugType>
     <Optimize>true</Optimize>
-    <OutputPath>..\..\..\Games\steamapps\common\RimWorld\Mods\WaterPhysics\Assemblies\</OutputPath>
+    <OutputPath>D:\Games\steamapps\common\RimWorld\Mods\WaterPhysics\Assemblies</OutputPath>
     <DefineConstants>TRACE</DefineConstants>
     <ErrorReport>prompt</ErrorReport>
     <WarningLevel>4</WarningLevel>
@@ -47,6 +47,7 @@
     </Reference>
   </ItemGroup>
   <ItemGroup>
+    <Compile Include="GenStep_Elevation.cs" />
     <Compile Include="PlaySettings_ToggleableIcon.cs" />
     <Compile Include="TexButton.cs" />
     <Compile Include="Main.cs" />
@@ -56,10 +57,14 @@
   </ItemGroup>
   <Import Project="$(MSBuildToolsPath)\Microsoft.CSharp.targets" />
   <PropertyGroup>
-    <PostBuildEvent>xcopy "$(ProjectDir)..\About\About.xml" "$(OutDir)..\About\" /Y /I
-xcopy "$(ProjectDir)..\About\Preview.png" "$(OutDir)..\About\" /Y /I
-xcopy "$(ProjectDir)..\Languages\*.*" "$(OutDir)..\Languages" /Y /I /E
-xcopy "$(ProjectDir)..\Defs\*.*" "$(OutDir)..\Defs" /Y /I /E
-xcopy "$(ProjectDir)..\Textures\*.*" "$(OutDir)..\Textures" /Y /I /E</PostBuildEvent>
+    <PostBuildEvent>echo
+xcopy "$(ProjectDir)..\About\About.xml" "$(OutDir)..\About\" /Y /I /f
+xcopy "$(ProjectDir)..\About\Preview.png" "$(OutDir)..\About\" /Y /I /f
+
+xcopy "$(ProjectDir)..\Languages\*.*" "$(OutDir)..\Languages" /Y /I /E /f
+
+xcopy "$(ProjectDir)..\Defs\*.*" "$(OutDir)..\Defs" /Y /I /E /f
+
+xcopy "$(ProjectDir)..\Textures\*.*" "$(OutDir)..\Textures" /Y /I /E /f</PostBuildEvent>
   </PropertyGroup>
 </Project>

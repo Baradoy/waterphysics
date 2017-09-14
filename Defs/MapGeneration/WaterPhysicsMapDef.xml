@@ -1,0 +1,16 @@
+<?xml version="1.0" encoding="utf-8" ?>
+<Defs>
+
+  <MapGeneratorDef>
+    <defName>BasicMap</defName>
+    <selectionWeight>0</selectionWeight>
+  </MapGeneratorDef>
+
+  <GenStepDef>
+      <defName>Elevation</defName>
+      <linkWithMapGenerator>BasicMap</linkWithMapGenerator>
+      <order>1600</order>
+      <genStep Class="WaterPhysics.GenStep_Elevation"/>
+  </GenStepDef>
+
+</Defs>

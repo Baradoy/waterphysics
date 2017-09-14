@@ -14,7 +14,7 @@ namespace WaterPhysics
 
             private Color color;
 
-            private byte level;
+            private byte level;            
 
             public static int colorCount = 32;
             private Color[] colorSpectrum;
@@ -31,9 +31,9 @@ namespace WaterPhysics
             {
                 this.grid = grid;
                 this.level = level;
-                this.color = color;
+                this.color = color;                
 
-                colorSpectrum = new Color[colorCount];
+                colorSpectrum = new Color[colorCount];               
 
                 for (var i = 0; i < colorCount; i++)
                 {
@@ -49,17 +49,22 @@ namespace WaterPhysics
             }
 
             public Color GetCellExtraColor(int index)
-            {                
-                return colorSpectrum[this.grid.grid[index]];
+            {
+                return new Color( this.grid.elevation[this.grid.map.cellIndices.IndexToCell(index)], 1f, 1f); 
+                // return colorSpectrum[this.grid.grid[index]];
             }
         }
 
-        private ByteGrid grid;        
+        private ByteGrid grid;
+
+        private MapGenFloatGrid elevation;
 
         private CellBoolDrawer drawer;     
 
         public TopographyGrid(Map map) : base(map)
-        {            
+        {
+            this.elevation = new MapGenFloatGrid(map);
+
             this.grid = new ByteGrid(map);
             for (int i = 0; i < map.cellIndices.NumGridCells; i++)
             {
@@ -85,9 +90,9 @@ namespace WaterPhysics
             }
         }       
 
-        public void SetValue(IntVec3 pos, byte val)
+        public void SetValue(IntVec3 pos, float val)
         {
-            this.grid[pos] = val;           
+            this.elevation[pos] = val;           
             if (this.drawer != null)
             {
                 this.drawer.SetDirty();
