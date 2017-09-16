@@ -21,8 +21,14 @@ namespace WaterPhysics
                 return;
             }
 
-            row.ToggleableIcon(ref SettingsController.ShowTopographyMap, TexButton.Pause,
-                "Show Topography Map", SoundDefOf.MouseoverToggle);
+            row.ToggleableIcon(ref SettingsController.ShowElevationMap, TexButton.Pause,
+                "Show Elevation Topography Map", SoundDefOf.MouseoverToggle);
+
+            row.ToggleableIcon(ref SettingsController.ShowMoistureMap, TexButton.Pause,
+                "Show Moisture Topography Map", SoundDefOf.MouseoverToggle);
+
+            row.ToggleableIcon(ref SettingsController.ShowWaterLevelMap, TexButton.Pause,
+                "Show Water Level Topography Map", SoundDefOf.MouseoverToggle);
         }
     }
 }

@@ -6,7 +6,9 @@ namespace WaterPhysics
 {
     public class SettingsController : Mod
     {
-        public static bool ShowTopographyMap = false;        
+        public static bool ShowElevationMap = false;
+        public static bool ShowMoistureMap = false;    
+        public static bool ShowWaterLevelMap = false;
 
         public SettingsController(ModContentPack content) : base(content)
         {

@@ -6,7 +6,7 @@ using RimWorld;
 
 namespace WaterPhysics
 {
-    public class GenStep_Elevation : GenStep
+    public class GenStep_WaterLevel : GenStep
     {
         public override void Generate(Map map)
         {          
@@ -19,7 +19,7 @@ namespace WaterPhysics
             
             foreach (IntVec3 current in map.AllCells)
             {           
-                topographyGrid.SetElevationFromElevation(current, MapGenerator.Elevation[current]);                
+                topographyGrid.SetWaterLevelFromElevation(current, MapGenerator.Elevation[current]);
             }            
         }
     }

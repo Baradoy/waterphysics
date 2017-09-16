@@ -13,4 +13,18 @@
       <genStep Class="WaterPhysics.GenStep_Elevation"/>
   </GenStepDef>
 
+  <GenStepDef>
+      <defName>Moisture</defName>
+      <linkWithMapGenerator>BasicMap</linkWithMapGenerator>
+      <order>1600</order>
+      <genStep Class="WaterPhysics.GenStep_Moisture"/>
+  </GenStepDef>
+
+  <GenStepDef>
+      <defName>WaterLevel</defName>
+      <linkWithMapGenerator>BasicMap</linkWithMapGenerator>
+      <order>1600</order>
+      <genStep Class="WaterPhysics.GenStep_WaterLevel"/>
+  </GenStepDef>
+
 </Defs>

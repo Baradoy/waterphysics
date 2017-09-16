@@ -47,6 +47,8 @@
     </Reference>
   </ItemGroup>
   <ItemGroup>
+    <Compile Include="GenStep_WaterLevel.cs" />
+    <Compile Include="GenStep_Moisture.cs" />
     <Compile Include="GenStep_Elevation.cs" />
     <Compile Include="PlaySettings_ToggleableIcon.cs" />
     <Compile Include="TexButton.cs" />
