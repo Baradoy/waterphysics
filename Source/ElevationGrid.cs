@@ -8,46 +8,8 @@ namespace WaterPhysics
 {
     public class TopographyGrid : MapComponent
     {
-        private class TopographyCellGiver : Verse.ICellBoolGiver
-        {
-            private Map map;            
-
-            private ByteGrid byteGrid;
-
-            private Color lowerColor;
-            private Color upperColor;
-
-            public Color Color
-            {
-                get
-                {
-                    return Color.white;
-                }
-            }
-
-            public TopographyCellGiver(Map map, ByteGrid byteGrid, Color lowerColor, Color upperColor)
-            {
-                this.map = map;                
-                this.byteGrid = byteGrid;
-                this.lowerColor = lowerColor;
-                this.upperColor = upperColor;
-            }
-
-            public bool GetCellBool(int index)
-            {                           
-                return true;
-            }
-
-            public Color GetCellExtraColor(int index)
-            {                              
-                return Color.Lerp(
-                    lowerColor,
-                    upperColor,
-                    this.byteGrid[this.map.cellIndices.IndexToCell(index)] / 256f
-                );                                          
-            }
-        }
-     
+        private int ticks = 0;
+        //Todo MouseoverReadout.MouseoverReadoutOnGUI override. 
         private ByteGrid elevation;
         private ByteGrid moisture;
         private ByteGrid waterLevel;
@@ -74,13 +36,15 @@ namespace WaterPhysics
         {
             if (this.elevationDrawer == null)
             {
-                elevationDrawer = new CellBoolDrawer(new TopographyGrid.TopographyCellGiver(map, elevation, Color.blue, new Color(69f / 256f, 56f / 256f, 35f / 256f)), this.map.Size.x, this.map.Size.z);
+                elevationDrawer = new CellBoolDrawer(new TopographyCellGiver(map, elevation, Color.yellow, Color.red), this.map.Size.x, this.map.Size.z);
             }
-            if (this.moistureDrawer == null) {
-                moistureDrawer = new CellBoolDrawer(new TopographyGrid.TopographyCellGiver(map, moisture, Color.blue, Color.white), this.map.Size.x, this.map.Size.z);
+            if (this.moistureDrawer == null)
+            {
+                moistureDrawer = new CellBoolDrawer(new TopographyCellGiver(map, moisture, Color.yellow, Color.cyan), this.map.Size.x, this.map.Size.z);
             }
-            if (this.waterLevelDrawer == null) {
-                waterLevelDrawer = new CellBoolDrawer(new TopographyGrid.TopographyCellGiver(map, waterLevel, Color.blue, Color.white), this.map.Size.x, this.map.Size.z);
+            if (this.waterLevelDrawer == null)
+            {
+                waterLevelDrawer = new CellBoolDrawer(new TopographyCellGiver(map, waterLevel, Color.yellow, Color.blue), this.map.Size.x, this.map.Size.z);
             }            
 
             if ( SettingsController.ShowElevationMap )
@@ -100,22 +64,99 @@ namespace WaterPhysics
         }
 
         public override void MapComponentTick()
-        {            
-            int index = Rand.Range(0, this.map.cellIndices.NumGridCells);
-            IntVec3 vector = this.map.cellIndices.IndexToCell(index);
-            if ( this.moisture[vector] < 254 && this.waterLevel[vector] > 0)
-            {
-                this.moisture[vector]++;
-                this.waterLevel[vector]--;
-            }
+        {
+            ticks++;
 
-            for (int i = 0; i < this.map.cellIndices.NumGridCells; i++) {
-                vector = this.map.cellsInRandomOrder.Get(i);
-                if (this.moisture[vector] < 254 && this.waterLevel[vector] > 0)
+            if (ticks > Settings.Viscosity)
+            {
+                ticks -= Settings.Viscosity;
+
+                FlowWater();
+                FlowGroundWater();
+                SeepWater();                
+
+                Dirty();
+            }
+        }
+
+        // Water flows down from one cell to another. 
+        private void FlowWater()
+        {
+            for (int i = 0; i < this.map.cellIndices.NumGridCells; i++)
+            {
+                IntVec3 cell = this.map.cellsInRandomOrder.Get(i);                
+                IEnumerable<IntVec3> adjacents = GenAdj.CellsAdjacentCardinal(cell, Rot4.Random, IntVec2.One);
+                
+                foreach (IntVec3 adjacentCell in adjacents)
+                {               
+                    if (GenGrid.InBounds(adjacentCell,map))
+                    {
+                        int cellHeight = this.elevation[cell] + this.waterLevel[cell];
+                        int adjacentHeight = this.elevation[adjacentCell] + this.waterLevel[adjacentCell];
+
+                        if (this.waterLevel[cell] > 0 && this.waterLevel[adjacentCell] < 255 && cellHeight > adjacentHeight)
+                        {
+                            byte flow = (byte)Math.Max(1, (cellHeight - adjacentHeight) / 10);
+                            this.waterLevel[adjacentCell] += flow;
+                            this.waterLevel[cell] -= flow;
+                        }
+                    }                    
+                }                
+            }
+        }
+
+        // Moves groundwater spreads to adjacent cells
+        private void FlowGroundWater()
+        {
+            for (int i = 0; i < this.map.cellIndices.NumGridCells; i++)
+            {
+                IntVec3 cell = this.map.cellsInRandomOrder.Get(i);
+                IEnumerable<IntVec3> adjacents = GenAdj.CellsAdjacentCardinal(cell, Rot4.Random, IntVec2.One);
+
+                foreach (IntVec3 adjacentCell in adjacents)
                 {
-                    this.moisture[vector]++;
-                    this.waterLevel[vector]--;
+                    if (GenGrid.InBounds(adjacentCell, map))
+                    {
+                        int cellHeight = this.elevation[cell] + this.moisture[cell];
+                        int adjacentHeight = this.elevation[adjacentCell] + this.moisture[adjacentCell];
+
+                        if (this.moisture[cell] > 0 && this.waterLevel[adjacentCell] < 255 && cellHeight > adjacentHeight)
+                        {
+                            this.waterLevel[adjacentCell]++;
+                            this.moisture[cell]--;
+                        }
+                    }
                 }
+            }
+        }
+
+        // Water seeps into the soil.
+        private void SeepWater()
+        {
+            for (int i = 0; i < this.map.cellIndices.NumGridCells; i++)
+            {
+                IntVec3 cell = this.map.cellsInRandomOrder.Get(i);
+                if (this.moisture[cell] <= 255 && this.waterLevel[cell] > 0)
+                {
+                    this.moisture[cell]++;
+                    this.waterLevel[cell]--;
+                }
+            }
+        }
+
+        private void Dirty()
+        {
+            if (this.moistureDrawer != null)
+            {
+                this.moistureDrawer.SetDirty();
+            }
+            if (this.waterLevelDrawer != null)
+            {
+                this.waterLevelDrawer.SetDirty();
+            }
+            if (this.elevationDrawer != null)
+            {
+                this.elevationDrawer.SetDirty();
             }
         }
 

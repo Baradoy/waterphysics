@@ -19,7 +19,7 @@ namespace WaterPhysics
             
             foreach (IntVec3 current in map.AllCells)
             {           
-                topographyGrid.SetMoistureFromElevation(current, MapGenerator.Elevation[current]);
+                // topographyGrid.SetMoistureFromElevation(current, MapGenerator.Elevation[current]);
             }            
         }
     }

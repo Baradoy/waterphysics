@@ -47,6 +47,7 @@
     </Reference>
   </ItemGroup>
   <ItemGroup>
+    <Compile Include="TopographyCellGiver.cs" />
     <Compile Include="GenStep_WaterLevel.cs" />
     <Compile Include="GenStep_Moisture.cs" />
     <Compile Include="GenStep_Elevation.cs" />

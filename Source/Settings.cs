@@ -6,6 +6,8 @@ namespace WaterPhysics
 {
     public class SettingsController : Mod
     {
+        public string viscosityBuffer;
+
         public static bool ShowElevationMap = false;
         public static bool ShowMoistureMap = false;    
         public static bool ShowWaterLevelMap = false;
@@ -25,21 +27,21 @@ namespace WaterPhysics
             Listing_Standard list = new Listing_Standard();
             list.ColumnWidth = canvas.width;
             list.Begin(canvas);
-            list.Label("Viscosity");
-            Settings.Viscosity = list.Slider(Settings.Viscosity, 0, 2);
+            list.Label("Ticks Between Updates");            
+            list.TextFieldNumeric<int>(ref Settings.Viscosity, ref viscosityBuffer, 0, 100000);
             list.End();
         }
     }
 
     class Settings : ModSettings
     {
-        public static float Viscosity = 1.0f;
+        public static readonly int defaultTick = 256;
+        public static int Viscosity = defaultTick;
 
         public override void ExposeData()
         {
             base.ExposeData();
-
-            Scribe_Values.Look<float>(ref Viscosity, "WaterPhysics.Viscosity", 1.0f, false);
+            Scribe_Values.Look<int>(ref Viscosity, "WaterPhysics.Viscosity", defaultTick, false);
         }
     }
 }
